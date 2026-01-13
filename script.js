@@ -217,10 +217,10 @@ function processFile(file) {
         const img = new Image();
         img.onload = function() {
             originalImage = img;
-            updateCanvasSize();
-            updatePreview();
             elements.previewPlaceholder.style.display = 'none';
             elements.previewCanvas.style.display = 'block';
+            updateCanvasSize();
+            updatePreview();
             elements.generateBtn.disabled = false;
             showToast('图片上传成功', 'success');
         };
