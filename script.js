@@ -17,6 +17,8 @@ let ctx = null;
 
 // 初始化函数
 function init() {
+    console.log('开始初始化应用...');
+    
     // 获取DOM元素
     elements = {
         // 上传相关
@@ -82,9 +84,24 @@ function init() {
         toast: document.getElementById('toast')
     };
     
+    // 检查DOM元素是否获取成功
+    console.log('DOM元素获取结果:', {
+        fileInput: elements.fileInput !== null,
+        uploadArea: elements.uploadArea !== null,
+        fontSize: elements.fontSize !== null,
+        generateBtn: elements.generateBtn !== null,
+        saveBtn: elements.saveBtn !== null,
+        helpLink: elements.helpLink !== null,
+        tabBtns: elements.tabBtns.length > 0,
+        closeBtns: elements.closeBtns.length > 0
+    });
+    
     // 初始化Canvas上下文
     if (elements.previewCanvas) {
         ctx = elements.previewCanvas.getContext('2d');
+        console.log('Canvas上下文初始化成功');
+    } else {
+        console.error('Canvas元素获取失败');
     }
     
     // 绑定事件
@@ -105,64 +122,91 @@ function init() {
 
 // 绑定事件函数
 function bindEvents() {
+    console.log('开始绑定事件...');
+    
+    // 安全检查函数
+    const safeAddEventListener = (element, event, handler) => {
+        if (element) {
+            element.addEventListener(event, handler);
+            return true;
+        } else {
+            console.warn(`尝试为null/undefined元素绑定${event}事件`);
+            return false;
+        }
+    };
+    
+    const safeAddArrayEventListener = (elementsArray, event, handler) => {
+        if (elementsArray && elementsArray.length > 0) {
+            elementsArray.forEach(element => {
+                element.addEventListener(event, handler);
+            });
+            return true;
+        } else {
+            console.warn(`尝试为null/undefined或空数组元素绑定${event}事件`);
+            return false;
+        }
+    };
+    
     // 上传事件
-    elements.fileInput.addEventListener('change', handleFileSelect);
+    safeAddEventListener(elements.fileInput, 'change', handleFileSelect);
     
     // 拖拽事件
-    elements.uploadArea.addEventListener('dragover', handleDragOver);
-    elements.uploadArea.addEventListener('dragleave', handleDragLeave);
-    elements.uploadArea.addEventListener('drop', handleDrop);
+    safeAddEventListener(elements.uploadArea, 'dragover', handleDragOver);
+    safeAddEventListener(elements.uploadArea, 'dragleave', handleDragLeave);
+    safeAddEventListener(elements.uploadArea, 'drop', handleDrop);
     
     // 样式设置事件
-    elements.fontSize.addEventListener('input', function() {
+    safeAddEventListener(elements.fontSize, 'input', function() {
         updateValueDisplays();
         updateCanvasSize();
         updatePreview();
     });
-    elements.outlineWidth.addEventListener('input', updateValueDisplays);
-    elements.backgroundOpacity.addEventListener('input', updateValueDisplays);
-    elements.backgroundHeight.addEventListener('input', function() {
+    safeAddEventListener(elements.outlineWidth, 'input', updateValueDisplays);
+    safeAddEventListener(elements.backgroundOpacity, 'input', updateValueDisplays);
+    safeAddEventListener(elements.backgroundHeight, 'input', function() {
         updateValueDisplays();
         updateCanvasSize();
         updatePreview();
     });
-    elements.saveQuality.addEventListener('input', updateValueDisplays);
+    safeAddEventListener(elements.saveQuality, 'input', updateValueDisplays);
     
     // 所有样式变化都触发实时预览
     const styleInputs = document.querySelectorAll('.style-section input, .style-section select');
-    styleInputs.forEach(input => {
-        input.addEventListener('change', updatePreview);
-    });
+    if (styleInputs.length > 0) {
+        styleInputs.forEach(input => {
+            input.addEventListener('change', updatePreview);
+        });
+        console.log('样式输入事件绑定完成:', styleInputs.length, '个元素');
+    }
     
     // 选项卡切换事件
-    elements.tabBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const targetTab = btn.dataset.tab;
+    safeAddArrayEventListener(elements.tabBtns, 'click', (e) => {
+        const btn = e.currentTarget;
+        const targetTab = btn.dataset.tab;
+        if (targetTab) {
             switchTab(targetTab);
-        });
+        }
     });
     
     // 文本输入事件
-    elements.subtitleText.addEventListener('input', function() {
+    safeAddEventListener(elements.subtitleText, 'input', function() {
         updateTextStats();
         updateCanvasSize();
         updatePreview();
     });
-    elements.clearTextBtn.addEventListener('click', clearText);
-    elements.templateBtn.addEventListener('click', showTemplates);
+    safeAddEventListener(elements.clearTextBtn, 'click', clearText);
+    safeAddEventListener(elements.templateBtn, 'click', showTemplates);
     
     // 操作按钮事件
-    elements.generateBtn.addEventListener('click', generateImage);
-    elements.saveBtn.addEventListener('click', saveImage);
-    elements.resetBtn.addEventListener('click', resetSettings);
+    safeAddEventListener(elements.generateBtn, 'click', generateImage);
+    safeAddEventListener(elements.saveBtn, 'click', saveImage);
+    safeAddEventListener(elements.resetBtn, 'click', resetSettings);
     
     // 模态框事件
-    elements.helpLink.addEventListener('click', () => showModal(elements.helpModal));
-    elements.aboutLink.addEventListener('click', () => showModal(elements.aboutModal));
-    elements.saveSettingsLink.addEventListener('click', () => showModal(elements.saveSettingsModal));
-    elements.closeBtns.forEach(btn => {
-        btn.addEventListener('click', hideModal);
-    });
+    safeAddEventListener(elements.helpLink, 'click', () => showModal(elements.helpModal));
+    safeAddEventListener(elements.aboutLink, 'click', () => showModal(elements.aboutModal));
+    safeAddEventListener(elements.saveSettingsLink, 'click', () => showModal(elements.saveSettingsModal));
+    safeAddArrayEventListener(elements.closeBtns, 'click', hideModal);
     
     // 点击模态框外部关闭
     window.addEventListener('click', (e) => {
@@ -172,7 +216,9 @@ function bindEvents() {
     });
     
     // 放大查看事件
-    elements.zoomBtn.addEventListener('click', zoomImage);
+    safeAddEventListener(elements.zoomBtn, 'click', zoomImage);
+    
+    console.log('所有事件绑定完成');
 }
 
 // 文件选择处理
