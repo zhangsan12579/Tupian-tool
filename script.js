@@ -9,76 +9,84 @@ let subtitleBackground = null;
 let recentImages = [];
 const MAX_RECENT_IMAGES = 6;
 
-// DOM元素获取
-const elements = {
-    // 上传相关
-    fileInput: document.getElementById('fileInput'),
-    uploadArea: document.getElementById('uploadArea'),
-    fileInfo: document.getElementById('fileInfo'),
-    fileName: document.getElementById('fileName'),
-    fileSize: document.getElementById('fileSize'),
-    
-    // 样式设置相关
-    fontSize: document.getElementById('fontSize'),
-    fontSizeValue: document.getElementById('fontSizeValue'),
-    fontFamily: document.getElementById('fontFamily'),
-    fontColor: document.getElementById('fontColor'),
-    outlineColor: document.getElementById('outlineColor'),
-    outlineWidth: document.getElementById('outlineWidth'),
-    outlineWidthValue: document.getElementById('outlineWidthValue'),
-    backgroundColor: document.getElementById('backgroundColor'),
-    backgroundOpacity: document.getElementById('backgroundOpacity'),
-    backgroundOpacityValue: document.getElementById('backgroundOpacityValue'),
-    backgroundHeight: document.getElementById('backgroundHeight'),
-    backgroundHeightValue: document.getElementById('backgroundHeightValue'),
-    textAlignLeft: document.getElementById('textAlignLeft'),
-    textAlignCenter: document.getElementById('textAlignCenter'),
-    textAlignRight: document.getElementById('textAlignRight'),
-    
-    // 选项卡相关
-    tabBtns: document.querySelectorAll('.tab-btn'),
-    tabPanels: document.querySelectorAll('.tab-panel'),
-    
-    // 文本输入相关
-    subtitleText: document.getElementById('subtitleText'),
-    textLines: document.getElementById('textLines'),
-    textChars: document.getElementById('textChars'),
-    clearTextBtn: document.getElementById('clearTextBtn'),
-    templateBtn: document.getElementById('templateBtn'),
-    
-    // 预览相关
-    previewCanvas: document.getElementById('previewCanvas'),
-    previewPlaceholder: document.getElementById('previewPlaceholder'),
-    zoomBtn: document.getElementById('zoomBtn'),
-    
-    // 操作按钮
-    generateBtn: document.getElementById('generateBtn'),
-    saveBtn: document.getElementById('saveBtn'),
-    resetBtn: document.getElementById('resetBtn'),
-    
-    // 保存选项
-    saveFormat: document.getElementById('saveFormat'),
-    saveQuality: document.getElementById('saveQuality'),
-    saveQualityValue: document.getElementById('saveQualityValue'),
-    
-    // 模态框
-    helpModal: document.getElementById('helpModal'),
-    aboutModal: document.getElementById('aboutModal'),
-    saveSettingsModal: document.getElementById('saveSettingsModal'),
-    helpLink: document.getElementById('helpLink'),
-    aboutLink: document.getElementById('aboutLink'),
-    saveSettingsLink: document.getElementById('saveSettingsLink'),
-    closeBtns: document.querySelectorAll('.close'),
-    
-    // 提示信息
-    toast: document.getElementById('toast')
-};
+// DOM元素对象（将在init函数中初始化）
+let elements = {};
 
 // Canvas上下文
-const ctx = elements.previewCanvas.getContext('2d');
+let ctx = null;
 
 // 初始化函数
 function init() {
+    // 获取DOM元素
+    elements = {
+        // 上传相关
+        fileInput: document.getElementById('fileInput'),
+        uploadArea: document.getElementById('uploadArea'),
+        fileInfo: document.getElementById('fileInfo'),
+        fileName: document.getElementById('fileName'),
+        fileSize: document.getElementById('fileSize'),
+        
+        // 样式设置相关
+        fontSize: document.getElementById('fontSize'),
+        fontSizeValue: document.getElementById('fontSizeValue'),
+        fontFamily: document.getElementById('fontFamily'),
+        fontColor: document.getElementById('fontColor'),
+        outlineColor: document.getElementById('outlineColor'),
+        outlineWidth: document.getElementById('outlineWidth'),
+        outlineWidthValue: document.getElementById('outlineWidthValue'),
+        backgroundColor: document.getElementById('backgroundColor'),
+        backgroundOpacity: document.getElementById('backgroundOpacity'),
+        backgroundOpacityValue: document.getElementById('backgroundOpacityValue'),
+        backgroundHeight: document.getElementById('backgroundHeight'),
+        backgroundHeightValue: document.getElementById('backgroundHeightValue'),
+        textAlignLeft: document.getElementById('textAlignLeft'),
+        textAlignCenter: document.getElementById('textAlignCenter'),
+        textAlignRight: document.getElementById('textAlignRight'),
+        
+        // 选项卡相关
+        tabBtns: document.querySelectorAll('.tab-btn'),
+        tabPanels: document.querySelectorAll('.tab-panel'),
+        
+        // 文本输入相关
+        subtitleText: document.getElementById('subtitleText'),
+        textLines: document.getElementById('textLines'),
+        textChars: document.getElementById('textChars'),
+        clearTextBtn: document.getElementById('clearTextBtn'),
+        templateBtn: document.getElementById('templateBtn'),
+        
+        // 预览相关
+        previewCanvas: document.getElementById('previewCanvas'),
+        previewPlaceholder: document.getElementById('previewPlaceholder'),
+        zoomBtn: document.getElementById('zoomBtn'),
+        
+        // 操作按钮
+        generateBtn: document.getElementById('generateBtn'),
+        saveBtn: document.getElementById('saveBtn'),
+        resetBtn: document.getElementById('resetBtn'),
+        
+        // 保存选项
+        saveFormat: document.getElementById('saveFormat'),
+        saveQuality: document.getElementById('saveQuality'),
+        saveQualityValue: document.getElementById('saveQualityValue'),
+        
+        // 模态框
+        helpModal: document.getElementById('helpModal'),
+        aboutModal: document.getElementById('aboutModal'),
+        saveSettingsModal: document.getElementById('saveSettingsModal'),
+        helpLink: document.getElementById('helpLink'),
+        aboutLink: document.getElementById('aboutLink'),
+        saveSettingsLink: document.getElementById('saveSettingsLink'),
+        closeBtns: document.querySelectorAll('.close'),
+        
+        // 提示信息
+        toast: document.getElementById('toast')
+    };
+    
+    // 初始化Canvas上下文
+    if (elements.previewCanvas) {
+        ctx = elements.previewCanvas.getContext('2d');
+    }
+    
     // 绑定事件
     bindEvents();
     
@@ -912,3 +920,6 @@ function switchTab(tabId) {
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', init);
+
+// 直接调用init函数，确保初始化一定会执行
+init();
