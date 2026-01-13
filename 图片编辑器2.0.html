@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片字幕生成器by晓舜</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="navbar">
+        <div class="container">
+            <h1 class="logo">图片字幕生成器by晓舜</h1>
+            <nav class="nav-links">
+                <a href="#" id="helpLink">帮助文档</a>
+                <a href="#" id="aboutLink">关于我们</a>
+                <a href="#" id="saveSettingsLink">保存设置</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <div class="container">
+            <!-- 左侧功能区 -->
+            <aside class="sidebar">
+                <!-- 图片上传区域 -->
+                <section class="upload-section">
+                    <h2>图片上传</h2>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-content">
+                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            <p>拖拽图片到此处或</p>
+                            <label for="fileInput" class="btn btn-primary">选择文件</label>
+                            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                        </div>
+                        <div class="file-info" id="fileInfo" style="display: none;">
+                            <span id="fileName">文件名</span>
+                            <span id="fileSize">文件大小</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 文本输入区域 -->
+                <section class="text-section">
+                    <h2>字幕文本</h2>
+                    <div class="text-input-container">
+                        <textarea id="subtitleText" placeholder="请输入字幕文本，支持多行输入...">别吵
+我在给自己写钓鱼网站呢
+对，这年头
+咱们猫咪都能自己写代码了</textarea>
+                        <div class="text-info">
+                            <span id="textLines">4 行</span>
+                            <span id="textChars">35 字符</span>
+                        </div>
+                    </div>
+                    <div class="text-actions">
+                        <button class="btn btn-secondary" id="clearTextBtn">清空文本</button>
+                        <button class="btn btn-secondary" id="templateBtn">文本模板</button>
+                    </div>
+                </section>
+
+            </aside>
+
+            <!-- 中间预览区 -->
+            <section class="preview-section">
+                <h2>实时预览</h2>
+                <div class="preview-container">
+                    <canvas id="previewCanvas" width="800" height="600"></canvas>
+                    <div class="preview-placeholder" id="previewPlaceholder">
+                        <p>请先上传图片</p>
+                    </div>
+                    <button class="btn btn-secondary zoom-btn" id="zoomBtn">放大查看</button>
+                </div>
+            </section>
+
+            <!-- 右侧样式设置区 -->
+            <aside class="style-sidebar">
+                <!-- 样式设置面板 -->
+                <section class="style-section">
+                    <h2>样式设置</h2>
+                    
+                    <!-- 选项卡导航栏 -->
+                    <div class="tab-nav">
+                        <button class="tab-btn active" data-tab="text">文字</button>
+                        <button class="tab-btn" data-tab="background">背景</button>
+                        <button class="tab-btn" data-tab="align">对齐</button>
+                    </div>
+                    
+                    <!-- 选项卡内容区域 -->
+                    <div class="tab-content">
+                        <!-- 文字设置选项卡 -->
+                        <div class="tab-panel active" id="text">
+                            <div class="form-group">
+                                <label for="fontSize">字体大小 (px):</label>
+                                <input type="range" id="fontSize" min="5" max="100" value="32">
+                                <span id="fontSizeValue">32</span>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="fontFamily">字体选择:</label>
+                                <select id="fontFamily">
+                                    <option value="Impact">Impact</option>
+                                    <option value="Arial">Arial</option>
+                                    <option value="SimSun">宋体</option>
+                                    <option value="SimHei">黑体</option>
+                                    <option value="Microsoft YaHei">微软雅黑</option>
+                                    <option value="KaiTi">楷体</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="fontColor">字体颜色:</label>
+                                <input type="color" id="fontColor" value="#ffffff">
+                            </div>
+                            
+                            <!-- 轮廓设置 -->
+                            <div class="form-group">
+                                <label for="outlineColor">轮廓颜色:</label>
+                                <input type="color" id="outlineColor" value="#000000">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="outlineWidth">轮廓粗细 (px):</label>
+                                <input type="range" id="outlineWidth" min="0" max="5" value="3">
+                                <span id="outlineWidthValue">3</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 背景设置选项卡 -->
+                        <div class="tab-panel" id="background">
+                            <div class="form-group">
+                                <label for="backgroundColor">背景颜色:</label>
+                                <input type="color" id="backgroundColor" value="#000000">
+                            </div>
+                            <div class="form-group">
+                                <label for="backgroundOpacity">背景透明度 (%):</label>
+                                <input type="range" id="backgroundOpacity" min="0" max="100" value="50">
+                                <span id="backgroundOpacityValue">50</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="backgroundHeight">背景高度/间距 (倍):</label>
+                                <input type="range" id="backgroundHeight" min="0.5" max="3" step="0.1" value="1.5">
+                                <span id="backgroundHeightValue">1.5</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 对齐设置选项卡 -->
+                        <div class="tab-panel" id="align">
+                            <div class="form-group text-align">
+                                <label>
+                                    <input type="radio" name="textAlign" value="left" id="textAlignLeft">
+                                    <span>左对齐</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="textAlign" value="center" id="textAlignCenter" checked>
+                                    <span>居中</span>
+                                </label>
+                                <label>
+                                    <input type="radio" name="textAlign" value="right" id="textAlignRight">
+                                    <span>右对齐</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </aside>
+        </div>
+    </main>
+
+    <!-- 底部操作区 -->
+    <footer class="action-footer">
+        <div class="container">
+            <div class="action-buttons">
+                <button class="btn btn-primary" id="generateBtn">生成字幕图片</button>
+                <button class="btn btn-success" id="saveBtn" disabled>保存图片</button>
+                <button class="btn btn-secondary" id="resetBtn">重置设置</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 模态框 -->
+    <div class="modal" id="helpModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>帮助文档</h2>
+            <div class="modal-body">
+                <h3>图片字幕生成器操作手册</h3>
+                
+                <h4>一、系统介绍</h4>
+                <p>图片字幕生成器是一款轻量级的网页工具，用于在图片底部添加多行字幕，支持丰富的样式自定义。</p>
+                
+                <h4>二、功能说明</h4>
+                <ul>
+                    <li>图片上传：支持拖拽或点击选择图片文件</li>
+                    <li>字幕编辑：支持多行文本输入</li>
+                    <li>样式自定义：字体、颜色、轮廓、背景等多种样式设置</li>
+                    <li>实时预览：调整样式时实时显示效果</li>
+                    <li>图片保存：支持PNG/JPG格式和质量调节</li>
+                    <li>最近图片：自动保存最近6张生成的图片</li>
+                </ul>
+                
+                <h4>三、详细操作步骤</h4>
+                <ol>
+                    <li><strong>上传图片</strong>
+                        <ul>
+                            <li>拖拽图片到上传区域</li>
+                            <li>或点击"选择文件"按钮选择本地图片</li>
+                            <li>支持常见图片格式（PNG、JPG、JPEG等）</li>
+                        </ul>
+                    </li>
+                    <li><strong>编辑字幕</strong>
+                        <ul>
+                            <li>在"字幕文本"区域输入或粘贴文字</li>
+                            <li>支持多行输入，每行自动换行</li>
+                            <li>可随时清空或使用文本模板</li>
+                        </ul>
+                    </li>
+                    <li><strong>调整样式</strong>
+                        <ul>
+                            <li><strong>文字设置</strong>：字体大小、字体选择、字体颜色、轮廓颜色、轮廓粗细</li>
+                            <li><strong>背景设置</strong>：背景颜色、背景透明度、背景高度/间距</li>
+                            <li><strong>对齐设置</strong>：左对齐、居中对齐、右对齐</li>
+                        </ul>
+                    </li>
+                    <li><strong>预览效果</strong>
+                        <ul>
+                            <li>所有样式调整都会实时显示在预览区域</li>
+                            <li>点击"放大查看"可全屏预览</li>
+                        </ul>
+                    </li>
+                    <li><strong>生成图片</strong>
+                        <ul>
+                            <li>点击"生成字幕图片"按钮</li>
+                            <li>生成后可在最近图片中查看</li>
+                        </ul>
+                    </li>
+                    <li><strong>保存图片</strong>
+                        <ul>
+                            <li>点击"保存设置"可调整保存格式和质量</li>
+                            <li>点击"保存图片"按钮下载生成的图片</li>
+                        </ul>
+                    </li>
+                </ol>
+                
+                <h4>四、样式设置说明</h4>
+                <ul>
+                    <li><strong>字体大小</strong>：5-100像素，调整文字高度</li>
+                    <li><strong>字体选择</strong>：支持多种中文字体和英文字体</li>
+                    <li><strong>字体颜色</strong>：选择文字的显示颜色</li>
+                    <li><strong>轮廓颜色</strong>：文字边缘轮廓的颜色</li>
+                    <li><strong>轮廓粗细</strong>：0-5像素，调整轮廓宽度</li>
+                    <li><strong>背景颜色</strong>：字幕区域的背景颜色</li>
+                    <li><strong>背景透明度</strong>：0-100%，调整背景的透明程度</li>
+                    <li><strong>背景高度/间距</strong>：0.5-3倍，调整字幕行高和背景高度</li>
+                </ul>
+                
+                <h4>五、最近图片功能</h4>
+                <ul>
+                    <li>自动保存最近6张生成的图片</li>
+                    <li>点击图片可放大预览</li>
+                    <li>双击图片可重新加载编辑</li>
+                    <li>鼠标悬停显示删除按钮，可手动删除</li>
+                    <li>不会保存相同的图片</li>
+                </ul>
+                
+                <h4>六、常见问题解答</h4>
+                <ul>
+                    <li><strong>问题</strong>：为什么图片上传失败？<br><strong>解答</strong>：请检查图片格式是否支持，或图片大小是否过大。</li>
+                    <li><strong>问题</strong>：为什么无法保存图片？<br><strong>解答</strong>：请确保先点击"生成字幕图片"按钮，生成后才能保存。</li>
+                    <li><strong>问题</strong>：如何调整字幕的行间距？<br><strong>解答</strong>：可通过"背景高度/间距"设置调整。</li>
+                    <li><strong>问题</strong>：最近图片可以保存多少张？<br><strong>解答</strong>：最多保存6张，超出会自动删除最早的。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="aboutModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>关于我们</h2>
+            <div class="modal-body">
+                <p>图片字幕生成器 v2.0</p>
+                <p>一款轻量级的网页工具，用于在图片底部添加多行字幕，支持丰富的样式自定义。</p>
+                <p>© 2026 图片编辑器团队</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 保存设置模态框 -->
+    <div class="modal" id="saveSettingsModal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>保存设置</h2>
+            <div class="modal-body">
+                <div class="save-options-modal">
+                    <div class="form-group">
+                        <label for="saveFormat">保存格式:</label>
+                        <select id="saveFormat">
+                            <option value="png">PNG</option>
+                            <option value="jpg">JPG</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="saveQuality">图片质量:</label>
+                        <input type="range" id="saveQuality" min="60" max="100" value="90">
+                        <span id="saveQualityValue">90%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 消息提示 -->
+    <div class="toast" id="toast"></div>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>

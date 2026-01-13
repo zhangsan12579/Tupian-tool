@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片编辑器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: inline-block;
+            width: 120px;
+            font-weight: bold;
+        }
+        input[type="number"], input[type="color"] {
+            width: 100px;
+            padding: 5px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        .buttons {
+            margin: 20px 0;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #preview {
+            margin-top: 20px;
+            max-width: 100%;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>图片字幕生成器</h1>
+        
+        <div class="form-group">
+            <label for="fileInput">选择文件:</label>
+            <input type="file" id="fileInput" accept="image/*">
+            <span id="fileName"></span>
+        </div>
+        
+        <div class="form-group">
+            <label for="subtitleHeight">字幕高度(px):</label>
+            <input type="number" id="subtitleHeight" value="40" min="10" max="200">
+            
+            <label for="fontSize">字体大小(px):</label>
+            <input type="number" id="fontSize" value="20" min="5" max="50">
+            
+            <label for="fontColor">字体颜色:</label>
+            <input type="color" id="fontColor" value="#ffffff">
+            
+            <label for="outlineColor">轮廓颜色:</label>
+            <input type="color" id="outlineColor" value="#000000">
+        </div>
+        
+        <div class="form-group">
+            <label for="subtitleText">字幕文本:</label>
+            <textarea id="subtitleText" placeholder="请输入字幕文本，支持多行">别吵
+我在给自己写钓鱼网站呢
+对，这年头
+咱们猫咪都能自己写代码了</textarea>
+        </div>
+        
+        <div class="buttons">
+            <button id="generateBtn">生成字幕图片</button>
+            <button id="saveBtn">保存图片</button>
+        </div>
+        
+        <canvas id="preview" width="800" height="600"></canvas>
+    </div>
+    
+    <script>
+        // 获取DOM元素
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const subtitleHeight = document.getElementById('subtitleHeight');
+        const fontSize = document.getElementById('fontSize');
+        const fontColor = document.getElementById('fontColor');
+        const outlineColor = document.getElementById('outlineColor');
+        const subtitleText = document.getElementById('subtitleText');
+        const generateBtn = document.getElementById('generateBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const canvas = document.getElementById('preview');
+        const ctx = canvas.getContext('2d');
+        
+        let originalImage = null;
+        
+        // 图片上传处理
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                fileName.textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        originalImage = img;
+                        // 调整canvas大小
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        // 绘制原图
+                        ctx.drawImage(img, 0, 0);
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // 生成字幕图片
+        generateBtn.addEventListener('click', function() {
+            if (!originalImage) {
+                alert('请先选择图片');
+                return;
+            }
+            
+            // 清除canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制原图
+            ctx.drawImage(originalImage, 0, 0);
+            
+            // 获取设置参数
+            const height = parseInt(subtitleHeight.value);
+            const size = parseInt(fontSize.value);
+            const color = fontColor.value;
+            const outline = outlineColor.value;
+            const text = subtitleText.value;
+            
+            // 分割文本为多行
+            const lines = text.split('\n');
+            
+            // 计算每行的位置和背景
+            const lineHeight = height / lines.length;
+            
+            // 设置字体
+            ctx.font = size + 'px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // 绘制每行文字和背景
+            lines.forEach((line, index) => {
+                if (line.trim() === '') return;
+                
+                // 计算文本宽度
+                const textWidth = ctx.measureText(line).width;
+                
+                // 计算背景位置
+                const bgX = 0;
+                const bgY = canvas.height - height + index * lineHeight;
+                const bgWidth = canvas.width;
+                const bgHeight = lineHeight;
+                
+                // 绘制背景
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(bgX, bgY, bgWidth, bgHeight);
+                
+                // 绘制文字轮廓
+                ctx.strokeStyle = outline;
+                ctx.lineWidth = 2;
+                ctx.strokeText(line, canvas.width / 2, bgY + bgHeight / 2);
+                
+                // 绘制文字
+                ctx.fillStyle = color;
+                ctx.fillText(line, canvas.width / 2, bgY + bgHeight / 2);
+            });
+        });
+        
+        // 保存图片
+        saveBtn.addEventListener('click', function() {
+            if (!originalImage) {
+                alert('请先生成图片');
+                return;
+            }
+            
+            // 创建下载链接
+            const link = document.createElement('a');
+            link.download = '带字幕的图片.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+    </script>
+</body>
+</html>
