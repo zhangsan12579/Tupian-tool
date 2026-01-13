@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "图片编辑器2.0.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "图片编辑器2.0.html"
+    }
+  ]
+}
